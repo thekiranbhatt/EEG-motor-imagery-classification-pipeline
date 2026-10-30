@@ -1,4 +1,4 @@
-"""Step 4: plots. Every function saves a PNG and closes the figure."""
+"""Create and save analysis plots."""
 import matplotlib
 matplotlib.use("Agg")  # no pop-up windows, just save files
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ import numpy as np
 
 
 def plot_psd(raw, path, title):
-    """Power spectrum of the recording (check filtering and alpha peak)."""
+    """Plot the recording's power spectrum."""
     fig = raw.compute_psd(fmax=60, picks="eeg", verbose=False).plot(
         show=False, average=True)
     fig.suptitle(title)
@@ -15,11 +15,9 @@ def plot_psd(raw, path, title):
 
 
 def plot_erd(epochs, path):
-    """Mu-band (8-12 Hz) power at C3 and C4 for left vs right imagery.
+    """Plot mu-band power at C3 and C4 for each hand.
 
-    Imagining a hand movement lowers mu power over the opposite side of the
-    brain (event-related desynchronisation, ERD):
-      right hand -> drop at C3,  left hand -> drop at C4.
+    Values show percentage change from the period before the cue.
     """
     ep = epochs.copy().pick(["C3", "C4"]).filter(8, 12, verbose=False)
     ep.apply_hilbert(envelope=True)
@@ -47,8 +45,7 @@ def plot_erd(epochs, path):
 
 
 def plot_csp_patterns(csp, info, path):
-    """Scalp maps of the CSP filters: where the left/right difference lives."""
-    # Only draw the components the classifier actually uses (not all 64).
+    """Plot the sensor patterns used by the classifier."""
     fig = csp.plot_patterns(info, components=list(range(csp.n_components)),
                             ch_type="eeg", units="Pattern (AU)",
                             size=1.5, show=False)
@@ -75,7 +72,7 @@ def plot_confusion(cm, path, title):
 
 
 def plot_summary(df, path):
-    """Accuracy per subject, with the chance level for comparison."""
+    """Plot accuracy for each subject."""
     fig, ax = plt.subplots(figsize=(7, 4))
     ax.bar(df["subject"].astype(str), df["accuracy"], color="tab:blue")
     ax.axhline(0.5, color="red", ls="--", label="chance (50%)")

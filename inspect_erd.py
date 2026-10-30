@@ -1,10 +1,4 @@
-
-"""
-Inspect motor-imagery ERD without generating plots.
-
-Calculates percentage power change from baseline
-for mu (8-13 Hz) and beta (13-30 Hz) bands.
-"""
+"""Print mu- and beta-band power changes for each subject."""
 
 import sys
 from pathlib import Path
@@ -36,10 +30,7 @@ TASK = (0.5, 3.5)
 
 
 def calculate_erd(epochs, band_name, low, high):
-    """Calculate channel-wise ERD percentage for each class.
-
-    Input epochs have already been filtered into the relevant band.
-    """
+    """Calculate power change by channel for each hand."""
 
     results = []
 
@@ -89,7 +80,6 @@ def run_subject(subject):
     all_results = []
 
     for band_name, (low, high) in BANDS.items():
-        # Filter the continuous recording before epoching.
         band_raw = raw.copy()
         band_raw.filter(
             l_freq=low,

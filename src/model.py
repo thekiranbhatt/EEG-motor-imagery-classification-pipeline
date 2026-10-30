@@ -1,4 +1,4 @@
-"""Step 3: the classifier. CSP extracts features, LDA makes the decision."""
+"""Train and evaluate the left- vs. right-hand model."""
 import numpy as np
 from mne.decoding import CSP
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -11,14 +11,13 @@ from config import CLF_TMAX, CLF_TMIN, CV_FOLDS, N_CSP_COMPONENTS, RANDOM_STATE
 
 
 def build_pipeline() -> Pipeline:
-    """CSP finds spatial filters that best separate left from right.
-    It outputs log band power, which LDA then classifies."""
+    """Build the CSP and LDA model."""
     return Pipeline([
         ("csp", CSP(n_components=N_CSP_COMPONENTS, log=True)),
         ("lda", LinearDiscriminantAnalysis()),
     ])
 def get_data(epochs):
-    """Crop to the imagery window and return X (trials, channels, times), y (0/1)."""
+    """Return trial data and labels for the imagery window."""
     cropped = epochs.copy().crop(tmin=CLF_TMIN, tmax=CLF_TMAX)
     X = cropped.get_data(copy=True)
     y = cropped.events[:, -1] - 2  # left -> 0, right -> 1
@@ -26,7 +25,7 @@ def get_data(epochs):
 
 
 def evaluate(X, y):
-    """Cross-validated performance. CSP is re-fitted inside every fold."""
+    """Evaluate the model with cross-validation."""
     pipe = build_pipeline()
     cv = StratifiedKFold(
         n_splits=CV_FOLDS,
@@ -62,5 +61,5 @@ def evaluate(X, y):
 
 
 def fit_final(X, y) -> Pipeline:
-    """Fit on all trials, only used to draw the CSP patterns."""
+    """Fit the final model for the sensor-pattern plot."""
     return build_pipeline().fit(X, y)

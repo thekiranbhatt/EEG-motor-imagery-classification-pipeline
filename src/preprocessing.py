@@ -1,11 +1,11 @@
-"""Step 2: clean the signal and cut it into labelled trials (epochs)."""
+"""Filter recordings and split them into trials."""
 import mne
 
 from config import L_FREQ, H_FREQ, TMIN, TMAX
 
 
 def filter_raw(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
-    """Band-pass filter to keep only the mu and beta rhythms."""
+    """Keep signal changes between the configured frequency limits."""
     raw = raw.copy()
     raw.filter(L_FREQ, H_FREQ, fir_design="firwin",
                skip_by_annotation="edge", verbose=False)
@@ -13,11 +13,9 @@ def filter_raw(raw: mne.io.BaseRaw) -> mne.io.BaseRaw:
 
 
 def make_epochs(raw: mne.io.BaseRaw) -> mne.Epochs:
-    """Cut the recording into trials.
+    """Split the recording into left- and right-hand trials.
 
-    In these runs the annotations are:
-      T0 = rest, T1 = left fist, T2 = right fist.
-    We keep only T1 and T2.
+    T0 marks rest, T1 the left hand, and T2 the right hand.
     """
     events, _ = mne.events_from_annotations(
         raw, event_id=dict(T1=2, T2=3), verbose=False)

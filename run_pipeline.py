@@ -1,10 +1,8 @@
-
-"""
-Run the whole pipeline: python run_pipeline.py [subject numbers]
+"""Run the analysis for default subjects or the numbers provided.
 
 Examples:
-    python run_pipeline.py          # uses SUBJECTS from src/config.py
-    python run_pipeline.py 1 7 12   # only these subjects
+    python run_pipeline.py
+    python run_pipeline.py 1 7 12
 """
 
 import sys
@@ -31,11 +29,9 @@ def run_subject(subject: int) -> dict:
     print(f"\n=== Subject {subject} ===")
     tag = f"S{subject:03d}"
 
-    # 1. Load data
     raw = load_subject(subject)
     plot_psd(raw, FIG_DIR / f"{tag}_psd_raw.png", f"{tag} raw")
 
-    # 2. Preprocess
     raw = filter_raw(raw)
     plot_psd(
         raw,
@@ -45,7 +41,6 @@ def run_subject(subject: int) -> dict:
 
     epochs = make_epochs(raw)
 
-    # 3. Select channels (optional)
     if USE_MOTOR_ONLY:
         motor = {
             "FC3", "FC1", "FCZ", "FC2", "FC4",
@@ -74,7 +69,6 @@ def run_subject(subject: int) -> dict:
 
     plot_erd(epochs, FIG_DIR / f"{tag}_erd.png")
 
-    # 4. Classification
     X, y = get_data(epochs)
     res = evaluate(X, y)
 
@@ -89,7 +83,6 @@ def run_subject(subject: int) -> dict:
         f"(CV accuracy={res['accuracy']:.3f})"
     )
 
-    # 5. Visualization
     plot_confusion(
         res["confusion_matrix"],
         FIG_DIR / f"{tag}_confusion.png",
@@ -112,7 +105,6 @@ def run_subject(subject: int) -> dict:
 
 
 def main():
-    # Ensure output directories exist
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     METRIC_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -130,7 +122,6 @@ def main():
         print("No subject finished.")
         return
 
-    # Save summary
     df = pd.DataFrame(rows)
     df.to_csv(METRIC_DIR / "summary.csv", index=False)
 
