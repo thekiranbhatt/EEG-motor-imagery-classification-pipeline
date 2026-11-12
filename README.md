@@ -19,6 +19,7 @@ bci-motor-imagery/
 ├── README.md
 ├── requirements.txt       Packages used by the project
 ├── run_pipeline.py        Runs the analysis
+├── inspect_erd.py         Prints mu- and beta-band power changes
 ├── src/
 │   ├── config.py          Settings such as subjects, sessions, and time ranges
 │   ├── data_loading.py    Downloads and opens the recordings
@@ -154,10 +155,25 @@ After the program finishes, the output is saved in the `results` folder:
   of trials, training accuracy, cross-validated accuracy, and ROC AUC.
 - `results/figures/` contains the signal, ERD, confusion-matrix, sensor-pattern,
   and accuracy-summary charts.
+- `results/metrics/summary_all_channels.csv` has the same table for the
+  all-channels comparison described below.
+- `results/metrics/erd_summary.csv` has the mu- and beta-band ERD values
+  from `inspect_erd.py`.
 
-Accuracy varies by subject and by the trials available. Results around 60% to
-80% have been observed for some subjects, while others may be near the 50%
-reference line. These are approximate expectations, not guaranteed outcomes.
+On subjects 1-5 (45 trials each), five-fold cross-validated accuracy with the
+17 motor-area channels was 80.0%, 84.4%, 44.4%, 57.8% and 51.1% (mean 63.6%;
+mean ROC AUC 0.69). Two subjects are clearly above chance and three are not.
+With 45 trials per subject, the 95% chance range is roughly 35%-65%.
+
+### Channel selection
+
+Using all available channels gave a mean cross-validated accuracy of 60.9%
+(mean ROC AUC 0.67), against 63.6% with the 17 motor channels. The difference
+is much smaller than the subject-level uncertainty (about +/-7.5 points with
+45 trials each), so motor channels were chosen on neuroscientific grounds, not
+because they scored higher. All-channel models fit the training data almost
+perfectly (91-100% training accuracy), a sign of overfitting. Settings were
+explored on these same subjects, so scores may be slightly optimistic.
 
 ## Possible next steps
 
