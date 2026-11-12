@@ -1,6 +1,10 @@
 data/
-results/
+# Keep the results summary and figures in the repo so reviewers can see them.
+results/*
+!results/metrics/
+!results/figures/
 venv/
 .venv/
 __pycache__/
 *.pyc
+.DS_Store
